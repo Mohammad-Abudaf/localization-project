@@ -61,8 +61,8 @@ PROCESS_THREAD(sink_process, ev, data)
 
     puts("Sink starting -- server udp");
 
-    simple_udp_register(&udp_conn, DEST_PORT, NULL,
-                        SOURCE_PORT, udp_rx_callback);
+    simple_udp_register(&udp_conn, SOURCE_PORT, NULL,
+                        DEST_PORT, udp_rx_callback);
 
 
     PROCESS_END();
