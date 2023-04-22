@@ -38,7 +38,8 @@ build/sky/obj/anchor.o: anchor.c /home/mhmd/contiki-ng/os/contiki.h \
  /home/mhmd/contiki-ng/os/net/mac/framer/framer.h \
  /home/mhmd/contiki-ng/os/net/ipv6/uip-ds6-route.h \
  /home/mhmd/contiki-ng/os/lib/list.h \
- /home/mhmd/contiki-ng/os/net/ipv6/uip-sr.h
+ /home/mhmd/contiki-ng/os/net/ipv6/uip-sr.h \
+ /home/mhmd/contiki-ng/os/dev/radio.h
 
 /home/mhmd/contiki-ng/os/contiki.h:
 
@@ -129,3 +130,5 @@ build/sky/obj/anchor.o: anchor.c /home/mhmd/contiki-ng/os/contiki.h \
 /home/mhmd/contiki-ng/os/lib/list.h:
 
 /home/mhmd/contiki-ng/os/net/ipv6/uip-sr.h:
+
+/home/mhmd/contiki-ng/os/dev/radio.h:
