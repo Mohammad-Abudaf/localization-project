@@ -1,49 +1,76 @@
-#include "contiki.h"
-#include "radio.h"
+#include <math.h>
+#include <stdio.h> // for printf();
+#include <random.h>
+#include <inttypes.h>
+
+#include "contiki.h"   // RTOS
+
+
+// for logging
 #include "sys/log.h"
+#define LOG_MODULE "App"
+#define LOG_LEVEL LOG_LEVEL_INFO
+
+/*networking libs*/
 #include "net/ipv6/simple-udp.h"
 #include "net/routing/routing.h"
 #include "net/netstack.h"
 
-#define SOURCE_PORT 5678
-#define DEST_PORT 8888
+/*Communication def*/
+#define SOURCE_PORT 5555
+#define DEST_PORT 7777
+
+
+
+#define SEND_INTERVAL (60 * CLOCK_SECOND)
 
 static struct simple_udp_connection udp_conn;
 
-static void
-broadcast_recv(struct broadcast_conn *c, const linkaddr_t *from)
+PROCESS(sensing_process, "PROCESS: sensing");
+
+AUTOSTART_PROCESSES(&sensing_process);
+
+PROCESS_THREAD(sensing_process, ev, data)
 {
-    printf("broadcast message received from %d.%d: '%s'\n",
-           from->u8[0], from->u8[1], (char *)packetbuf_dataptr());
-}
+    
+    static struct etimer et; // event timer
 
-static struct broadcast_conn broadcast;
+    uip_ipaddr_t dest_ip_address;
+    static char payload[32]; // msg payload
 
-void mac_callback(void *dataPrt);
+    PROCESS_BEGIN(); // starting of the process
 
-PROCESS(source_localization, "PROCESS: Source");
-AUTOSTART_PROCESSES(&source_localization);
+    simple_udp_register(&udp_conn,
+                        DEST_PORT,
+                        NULL,
+                        SOURCE_PORT,
+                        NULL);
 
-PROCESS_THREAD(source_localization, ev, data)
-{
+    printf("\ninit sensing process\n");
 
-    static struct etimer periodic_time;
-
-    PROCESS_EXITHANDLER(broadcast_close(&broadcast);)
-    PROCESS_BEGIN();
-    broadcast_open(&broadcast, 129, &broadcast_recv);
-
-    etimer_set(&periodic_time, CLOCK_SECOND * 3);
+    etimer_set(&et, random_rand() % SEND_INTERVAL);
     while (1)
     {
+        PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
 
-        PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_time));
-        packetbuf_copyfrom("Hello", 6);
-        broadcast_send(&broadcast);
-        
-        printf("broadcast message sent\n");
+        if (NETSTACK_ROUTING.node_is_reachable() &&
+            NETSTACK_ROUTING.get_root_ipaddr(&dest_ip_address))
+        {
 
-        etimer_reset(&periodic_time);
+            
+            LOG_INFO_6ADDR(&dest_ip_address);
+            LOG_INFO_("\n");
+
+            // fill the payload!
+            snprintf(payload, sizeof(payload), "Hello");
+
+            // send the packet
+            simple_udp_sendto(&udp_conn, payload,
+                              strlen(payload), &dest_ip_address);
+        }
+        /* Add some jitter */
+        etimer_set(&et, SEND_INTERVAL - CLOCK_SECOND + (random_rand() % (2 * CLOCK_SECOND)));
     }
-    PROCESS_END();
+
+    PROCESS_END(); // end of the process
 }
