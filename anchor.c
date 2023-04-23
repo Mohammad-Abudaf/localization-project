@@ -39,10 +39,10 @@ udp_rx_callback(struct simple_udp_connection *c,
     LOG_INFO("Received data '%.*s' from ", datalen, (char *)data);
     LOG_INFO_6ADDR(sender_addr);
     LOG_INFO_("\n");
-    int rssi = (int16_t)packetbuf_attr(PACKETBUF_ATTR_RSSI);
-    // radio_value_t radio_rssi;
-    // NETSTACK_RADIO.get_value(RADIO_PARAM_LAST_RSSI, &radio_rssi);
-    printf("value is %d from call back", rssi);
+    // int rssi = (int16_t)packetbuf_attr(PACKETBUF_ATTR_RSSI);
+    // // radio_value_t radio_rssi;
+    // // NETSTACK_RADIO.get_value(RADIO_PARAM_LAST_RSSI, &radio_rssi);
+    // printf("value is %d from call back", rssi);
 
 #if WITH_SERVER_REPLY
     /* send back the same string to the client as an echo reply */
