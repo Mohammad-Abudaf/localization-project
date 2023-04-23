@@ -36,9 +36,9 @@ udp_rx_callback(struct simple_udp_connection *c,
   LOG_INFO("Received data '%.*s' from ", datalen, (char *) data);
   LOG_INFO_6ADDR(sender_addr);
   LOG_INFO_("\n");
-  unsigned int value = 0;
-  radio.get_value(RADIO_PARAM_LAST_RSSI, (int*)value);
-  printf("value is %d", value);
+  int* value = NULL;
+  radio.get_value(RADIO_PARAM_LAST_RSSI, value);
+  printf("value is %d", *value);
 
 
 #if WITH_SERVER_REPLY
