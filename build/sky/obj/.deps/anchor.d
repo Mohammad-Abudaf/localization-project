@@ -44,6 +44,7 @@ build/sky/obj/anchor.o: anchor.c /home/mhmd/contiki-ng/os/contiki.h \
  /home/mhmd/contiki-ng/os/net/mac/framer/frame802154.h \
  /home/mhmd/contiki-ng/os/net/mac/csma/csma-security.h \
  /home/mhmd/contiki-ng/os/net/mac/tsch/tsch-conf.h \
+ /home/mhmd/contiki-ng/os/lib/random.h \
  /home/mhmd/contiki-ng/os/dev/radio.h
 
 /home/mhmd/contiki-ng/os/contiki.h:
@@ -145,5 +146,7 @@ build/sky/obj/anchor.o: anchor.c /home/mhmd/contiki-ng/os/contiki.h \
 /home/mhmd/contiki-ng/os/net/mac/csma/csma-security.h:
 
 /home/mhmd/contiki-ng/os/net/mac/tsch/tsch-conf.h:
+
+/home/mhmd/contiki-ng/os/lib/random.h:
 
 /home/mhmd/contiki-ng/os/dev/radio.h:

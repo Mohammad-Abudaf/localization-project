@@ -8,8 +8,10 @@
 #include "net/routing/routing.h"
 #include "net/netstack.h"
 #include "packetbuf.h"
-
+#include "random.h"
 #include "radio.h"
+
+#define SEND_INTERVAL (60 * CLOCK_SECOND)
 
 /*Communication def*/
 #define SOURCE_PORT 5555
@@ -37,10 +39,10 @@ udp_rx_callback(struct simple_udp_connection *c,
     LOG_INFO("Received data '%.*s' from ", datalen, (char *)data);
     LOG_INFO_6ADDR(sender_addr);
     LOG_INFO_("\n");
-    // int rssi = (int16_t)packetbuf_attr(PACKETBUF_ATTR_RSSI);
-    radio_value_t radio_rssi;
-    NETSTACK_RADIO.get_value(RADIO_PARAM_LAST_RSSI, &radio_rssi);
-    printf("value is %d", radio_rssi);
+    int rssi = (int16_t)packetbuf_attr(PACKETBUF_ATTR_RSSI);
+    // radio_value_t radio_rssi;
+    // NETSTACK_RADIO.get_value(RADIO_PARAM_LAST_RSSI, &radio_rssi);
+    printf("value is %d from call back", rssi);
 
 #if WITH_SERVER_REPLY
     /* send back the same string to the client as an echo reply */
@@ -55,6 +57,8 @@ AUTOSTART_PROCESSES(&sink_process);
 PROCESS_THREAD(sink_process, ev, data)
 {
 
+    static struct etimer et; // event timer
+
     PROCESS_BEGIN();
 
     /* Initialize DAG root */
@@ -65,10 +69,17 @@ PROCESS_THREAD(sink_process, ev, data)
     simple_udp_register(&udp_conn, SOURCE_PORT, NULL,
                         DEST_PORT, udp_rx_callback);
 
-    // while (1)
-    // {
-    //     udp_rx_call_back();
-    // }
+    printf("\ninit sensing process\n");
+
+    etimer_set(&et, random_rand() % SEND_INTERVAL);
+    while (1)
+    {
+        PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&et));
+        radio_value_t radio_rssi;
+        NETSTACK_RADIO.get_value(RADIO_PARAM_LAST_RSSI, &radio_rssi);
+        printf("%d", radio_rssi);
+        etimer_set(&et, CLOCK_SECOND * 5);
+    }
 
     PROCESS_END();
 }
